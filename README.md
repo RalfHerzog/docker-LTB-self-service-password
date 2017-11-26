@@ -13,12 +13,14 @@ Pull the latest version of the image from the docker index. This is the recommen
 docker pull ralfherzog/ltb-self-service-password:1.1
 ```
 
-Then, provide your own `config.inc.php` file, downloaded from https://github.com/ltb-project/self-service-password/blob/v1.1/conf/config.inc.php and modified according to your settings.
+Then, provide your own `config.inc.php` file, downloaded from [https://github.com/ltb-project/self-service-password/blob/v1.1/conf/config.inc.php](https://github.com/ltb-project/self-service-password/blob/v1.1/conf/config.inc.php) and modified according to your settings.
 
 You can now run container:
 * in foreground:
 ```bash
-docker run -d -v $(pwd)/assets/config.inc.php:/usr/share/self-service-password/conf/config.inc.php:ro ralfherzog/ltb-self-service-password:1.1
+docker run -d \
+-v $(pwd)/assets/config.inc.php:/usr/share/self-service-password/conf/config.inc.php:ro \
+ralfherzog/ltb-self-service-password:1.1
 ```
 
 The examples above expose service on port `80` on the containers ip address, so you can point your browser to http://container-ip/ in order to change LDAP passwords.
@@ -52,7 +54,7 @@ ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7);
 ```
 Then inspect apache logs of a runnning container:
 ```bash
-docker exec -ti $(docker ps | grep 'ltb-self-service-password' | awk '{print $1}') tail /var/log/apache2/error.log
+docker exec -it $(docker ps | grep 'ltb-self-service-password' | awk '{print $1}') tail /var/log/apache2/error.log
 ```
 
 #### LDAPS with self-signed certificate
@@ -61,6 +63,18 @@ When connecting with LDAPS protocol to a server wtih a self-signed certificate, 
 TLS: peer cert untrusted or revoked (0x42)
 TLS: can't connect: (unknown error code).
 ```
+
+Mount your self signed ca certificate into the container:
+
+```bash
+docker run --rm -it \
+-v $(pwd)/assets/config.inc.php:/usr/share/self-service-password/conf/config.inc.php:ro \
+-v $(pwd)/assets/int.rherzog.de-CA.crt:/usr/local/share/ca-certificates/int.rherzog.de-CA.crt:ro \
+ralfherzog/docker-ltb-self-service-password:latest
+```
+
+##### The insecure way (not recommended)
+
 Add this into `config.inc.php` to disable all certificate validation:
 ```php
 putenv('LDAPTLS_REQCERT=never');
