@@ -20,4 +20,7 @@ ADD assets/config.inc.php /usr/share/self-service-password/conf/config.inc.php
 RUN mkdir /etc/service/apache2
 ADD assets/apache2.sh /etc/service/apache2/run
 
+# Run adding self signed certificates to system
+ADD assets/ca.sh /etc/my_init.d/ca.sh
+
 EXPOSE 80
