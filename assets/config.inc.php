@@ -22,6 +22,12 @@
 #==============================================================================
 # Configuration
 #==============================================================================
+
+# Debug mode
+# true: log and display any errors or warnings (use this in configuration/testing)
+# false: log only errors and do not display them (use this in production)
+$debug = false;
+
 # LDAP
 $ldap_url = "ldap://localhost";
 $ldap_starttls = false;
@@ -54,10 +60,14 @@ $samba_mode = false;
 # Shadow options - require shadowAccount objectClass
 # Update shadowLastChange
 $shadow_options['update_shadowLastChange'] = false;
+$shadow_options['update_shadowExpire'] = false;
+
+# Default to -1, never expire
+$shadow_options['shadow_expire_days'] = -1;
 
 # Hash mechanism for password:
-# SSHA
-# SHA
+# SSHA, SSHA256, SSHA384, SSHA512
+# SHA, SHA256, SHA384, SHA512
 # SMD5
 # MD5
 # CRYPT
@@ -68,6 +78,7 @@ $hash = "clear";
 
 # Prefix to use for salt with CRYPT
 $hash_options['crypt_salt_prefix'] = "$6$";
+$hash_options['crypt_salt_length'] = "6";
 
 # Local password policy
 # This is applied before directory password policy
@@ -113,6 +124,23 @@ $who_change_password = "user";
 # Use standard change form?
 $use_change = true;
 
+## SSH Key Change
+# Allow changing of sshPublicKey?
+$change_sshkey = false;
+
+# What attribute should be changed by the changesshkey action?
+$change_sshkey_attribute = "sshPublicKey";
+
+# Who changes the sshPublicKey attribute?
+# Also applicable for question/answer save
+# user: the user itself
+# manager: the above binddn
+$who_change_sshkey = "user";
+
+# Notify users anytime their sshPublicKey is changed
+## Requires mail configuration below
+$notify_on_sshkey_change = false;
+
 ## Questions/answers
 # Use questions/answers?
 # true (default)
@@ -141,9 +169,14 @@ $token_lifetime = "3600";
 ## Mail
 # LDAP mail attribute
 $mail_attribute = "mail";
+# Get mail address directly from LDAP (only first mail entry)
+# and hide mail input field
+# default = false
+$mail_address_use_ldap = false;
 # Who the email should come from
 $mail_from = "admin@example.com";
 $mail_from_name = "Self Service Password";
+$mail_signature = "";
 # Notify users anytime their password is changed
 $notify_on_change = false;
 # PHPMailer configuration (see https://github.com/PHPMailer/PHPMailer)
@@ -160,6 +193,7 @@ $mail_smtp_timeout = 30;
 $mail_smtp_keepalive = false;
 $mail_smtp_secure = 'tls';
 $mail_contenttype = 'text/plain';
+$mail_wordwrap = 0;
 $mail_charset = 'utf-8';
 $mail_priority = 3;
 $mail_newline = PHP_EOL;
@@ -167,6 +201,9 @@ $mail_newline = PHP_EOL;
 ## SMS
 # Use sms
 $use_sms = true;
+# SMS method (mail, api)
+$sms_method = "mail";
+$sms_api_lib = "lib/smsapi.inc.php";
 # GSM number attribute
 $sms_attribute = "mobile";
 # Partially hide number
@@ -177,12 +214,20 @@ $smsmailto = "{sms_attribute}@service.provider.com";
 $smsmail_subject = "Provider code";
 # Message
 $sms_message = "{smsresetmessage} {smstoken}";
-
+# Remove non digit characters from GSM number
+$sms_sanitize_number = false;
+# Truncate GSM number
+$sms_truncate_number = false;
+$sms_truncate_number_length = 10;
 # SMS token length
 $sms_token_length = 6;
-
 # Max attempts allowed for SMS token
 $max_attempts = 3;
+
+# Encryption, decryption keyphrase, required if $crypt_tokens = true
+# Please change it to anything long, random and complicated, you do not have to remember it
+# Changing it will also invalidate all previous tokens and SMS codes
+$keyphrase = "b4413c53712ce95eb81c9bda7ca5f33cae4ae8cc408f726d838db5ec0cb486fd";
 
 # Reset URL (if behind a reverse proxy)
 #$reset_url = $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_X_FORWARDED_HOST'] . $_SERVER['SCRIPT_NAME'];
@@ -190,8 +235,12 @@ $max_attempts = 3;
 # Display help messages
 $show_help = true;
 
-# Language
-$lang ="en";
+# Default language
+$lang = "en";
+
+# List of authorized languages. If empty, all language are allowed.
+# If not empty and the user's browser language setting is not in that list, language from $lang will be used.
+$allowed_lang = array();
 
 # Display menu on top
 $show_menu = true;
@@ -201,12 +250,6 @@ $logo = "images/ltb-logo.png";
 
 # Background image
 $background_image = "images/unsplash-space.jpeg";
-
-# Debug mode
-$debug = false;
-
-# Encryption, decryption keyphrase
-$keyphrase = "secret";
 
 # Where to log password resets - Make sure apache has write permission
 # By default, they are logged in Apache log
@@ -227,6 +270,9 @@ $recaptcha_privatekey = "";
 $recaptcha_theme = "light";
 $recaptcha_type = "image";
 $recaptcha_size = "normal";
+# reCAPTCHA request method, null for default, Fully Qualified Class Name to override
+# Useful when allow_url_fopen=0 ex. $recaptcha_request_method = '\ReCaptcha\RequestMethod\CurlPost';
+$recaptcha_request_method = null;
 
 ## Default action
 # change
@@ -241,5 +287,3 @@ $default_action = "change";
 
 # Launch a posthook script after successful password change
 #$posthook = "/usr/share/self-service-password/posthook.sh";
-
-?>
