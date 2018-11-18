@@ -10,17 +10,17 @@ You can either run the image and link it to an external configuration file, or y
 Pull the latest version of the image from the docker index. This is the recommended method of installation as it is easier to update image in the future. These builds are performed by the **Docker Trusted Build** service.
 
 ```bash
-docker pull ralfherzog/ltb-self-service-password:1.1
+docker pull ralfherzog/ltb-self-service-password:1.3
 ```
 
-Then, provide your own `config.inc.php` file, downloaded from [https://github.com/ltb-project/self-service-password/blob/v1.1/conf/config.inc.php](https://github.com/ltb-project/self-service-password/blob/v1.1/conf/config.inc.php) and modified according to your settings.
+Then, provide your own `config.inc.php` file, downloaded from [https://github.com/ltb-project/self-service-password/blob/v1.3/conf/config.inc.php](https://github.com/ltb-project/self-service-password/blob/v1.3/conf/config.inc.php) and modified according to your settings.
 
 You can now run container:
 * in foreground:
 ```bash
 docker run -d \
 -v $(pwd)/assets/config.inc.php:/usr/share/self-service-password/conf/config.inc.php:ro \
-ralfherzog/ltb-self-service-password:1.1
+ralfherzog/ltb-self-service-password:1.3
 ```
 
 The examples above expose service on port `80` on the containers ip address, so you can point your browser to http://container-ip/ in order to change LDAP passwords.

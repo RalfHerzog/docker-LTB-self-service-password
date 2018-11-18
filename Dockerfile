@@ -1,12 +1,12 @@
-FROM phusion/baseimage:0.9.22
+FROM phusion/baseimage:0.11
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV SELF_SERVICE_PASSWORD_VERSION 1.1-1
+ENV SELF_SERVICE_PASSWORD_VERSION 1.3-1
 
 # Install Apache2, PHP and LTB ssp
-RUN apt-get update && apt-get install -y apache2 libapache2-mod-php php php-mcrypt php-ldap php-mbstring php-xml && apt-get clean
+RUN apt-get update && apt-get install -y apache2 libapache2-mod-php php php-ldap php-mbstring php-xml && apt-get clean
 RUN curl -L https://ltb-project.org/archives/self-service-password_${SELF_SERVICE_PASSWORD_VERSION}_all.deb > self-service-password.deb && dpkg -i self-service-password.deb ; rm -f self-service-password.deb
 
 # Configure self-service-password site

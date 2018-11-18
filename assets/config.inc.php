@@ -20,6 +20,11 @@
 #==============================================================================
 
 #==============================================================================
+# All the default values are kept here, you should not modify it but use
+# config.inc.local.php file instead to override the settings from here.
+#==============================================================================
+
+#==============================================================================
 # Configuration
 #==============================================================================
 
@@ -104,6 +109,8 @@ $pwd_no_reuse = true;
 $pwd_diff_login = true;
 # Complexity: number of different class of character required
 $pwd_complexity = 0;
+# use pwnedpasswords api v2 to securely check if the password has been on a leak
+$use_pwnedpasswords = false;
 # Show policy constraints message:
 # always
 # never
@@ -151,6 +158,9 @@ $use_questions = true;
 $answer_objectClass = "extensibleObject";
 $answer_attribute = "info";
 
+# Crypt answers inside the directory
+$crypt_answers = true;
+
 # Extra questions (built-in questions are in lang/$lang.inc.php)
 #$messages['questions']['ice'] = "What is your favorite ice cream flavor?";
 
@@ -183,7 +193,7 @@ $notify_on_change = false;
 $mail_sendmailpath = '/usr/sbin/sendmail';
 $mail_protocol = 'smtp';
 $mail_smtp_debug = 0;
-$mail_debug_format = 'html';
+$mail_debug_format = 'error_log';
 $mail_smtp_host = 'localhost';
 $mail_smtp_auth = false;
 $mail_smtp_user = '';
@@ -192,6 +202,7 @@ $mail_smtp_port = 25;
 $mail_smtp_timeout = 30;
 $mail_smtp_keepalive = false;
 $mail_smtp_secure = 'tls';
+$mail_smtp_autotls = true;
 $mail_contenttype = 'text/plain';
 $mail_wordwrap = 0;
 $mail_charset = 'utf-8';
@@ -227,7 +238,7 @@ $max_attempts = 3;
 # Encryption, decryption keyphrase, required if $crypt_tokens = true
 # Please change it to anything long, random and complicated, you do not have to remember it
 # Changing it will also invalidate all previous tokens and SMS codes
-$keyphrase = "b4413c53712ce95eb81c9bda7ca5f33cae4ae8cc408f726d838db5ec0cb486fd";
+$keyphrase = "secret";
 
 # Reset URL (if behind a reverse proxy)
 #$reset_url = $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_X_FORWARDED_HOST'] . $_SERVER['SCRIPT_NAME'];
@@ -287,3 +298,13 @@ $default_action = "change";
 
 # Launch a posthook script after successful password change
 #$posthook = "/usr/share/self-service-password/posthook.sh";
+#$display_posthook_error = true;
+
+# Hide some messages to not disclose sensitive information
+# These messages will be replaced by badcredentials error
+#$obscure_failure_messages = array("mailnomatch");
+
+# Allow to override current settings with local configuration
+if (file_exists (__DIR__ . '/config.inc.local.php')) {
+    require __DIR__ . '/config.inc.local.php';
+}
